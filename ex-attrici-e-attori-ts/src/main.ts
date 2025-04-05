@@ -15,15 +15,6 @@ type Actress = Person & {
   nationality: 'American' | 'British' | 'Australian' | 'Israeli-American' | 'South African' | 'French' | 'Indian' | 'Israeli' | 'Spanish' | 'South Korean' | 'Chinese'
 }
 
-/* 📌 Milestone 3
-Crea una funzione getActress che, dato un id, effettua una chiamata a:
-
-GET https://boolean-spec-frontend.vercel.app/freetestapi/actresses/:id
-La funzione deve restituire l’oggetto Actress, se esiste, oppure null se non trovato.
-
-Utilizza un type guard chiamato isActress per assicurarti che la struttura del dato ricevuto sia corretta.
-
- */
 function isActress(dati: unknown): dati is Actress {
   if (
     dati &&
@@ -70,7 +61,7 @@ function isActress(dati: unknown): dati is Actress {
 
 async function getActress(id: number): Promise<Actress | null> {
   try {
-    const response = await fetch(`https://boolean-spec-frontend.vercel.app/freetestapi/actresses/:${id}`)
+    const response = await fetch(`https://boolean-spec-frontend.vercel.app/freetestapi/actresses/${id}`)
     if (!response.ok) {
       throw new Error(`Errore HTTP ${response.status} : ${response.statusText}`)
     }
@@ -88,3 +79,34 @@ async function getActress(id: number): Promise<Actress | null> {
     return null
   }
 }
+getActress(3)
+  .then(result => {
+    console.log(result)
+  })
+
+
+async function getAllActresses(): Promise<Actress[]> {
+  try {
+    const response = await fetch(`https://boolean-spec-frontend.vercel.app/freetestapi/actresses`)
+    if (!response.ok) {
+      throw new Error(`Errore HTTP ${response.status} : ${response.statusText}`)
+    }
+    const data = await response.json()
+    if (Array.isArray(data)) {
+      const validActresses = data.filter(isActress)
+      return validActresses
+    } else {
+      throw new Error("Risposta non è un array");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Errore durante il recupero dei dati: ", error.message)
+    } else {
+      console.error("errore sconosciuto: ", error);
+    }
+  }
+  return []
+}
+
+
+getAllActresses().then(res => console.log(res))
